@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './ReportPage.css';
 
@@ -6,58 +6,74 @@ function ReportPage() {
   const location = useLocation();
   const navigate = useNavigate();
   
-  // Get the coordinates passed from the MainApp page
-  // We add a fallback in case the user navigates here directly
-  const { coords } = location.state || { coords: { lat: 'N/A', lng: 'N/A' } };
+  // State to hold our new analysis data
+  const [analysisData, setAnalysisData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const handleDownload = () => {
-    // In a real app, you'd generate a PDF here.
-    // For now, we'll just show an alert.
-    alert('Downloading report for ' + coords.lat + ', ' + coords.lng);
-  };
+  const { coords } = location.state || { coords: null };
 
-  const handleGoBack = () => {
-    navigate('/app'); // Navigate back to the map
-  };
+  // --- NEW: Fetch data when the page loads ---
+  useEffect(() => {
+    if (!coords) {
+      // If no coordinates were passed, don't try to fetch
+      setIsLoading(false);
+      return;
+    }
+
+    fetch('/api/analyze_proximity', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(coords)
+    })
+    .then(res => res.json())
+    .then(data => {
+      setAnalysisData(data);
+      setIsLoading(false);
+    })
+    .catch(err => {
+      console.error("Error fetching analysis:", err);
+      setIsLoading(false);
+    });
+  }, [coords]); // This effect runs only when 'coords' changes
+
+  // ... (keep handleDownload and handleGoBack functions) ...
+
+  if (isLoading) {
+    return <div className="report-page-background"><div className="report-container"><h2>Generating Report...</h2></div></div>;
+  }
+
+  if (!analysisData) {
+    return <div className="report-page-background"><div className="report-container"><h2>Could not generate report. Please go back and select a location.</h2></div></div>;
+  }
 
   return (
     <div className="report-page-background">
       <div className="report-container">
-        <div className="report-header">
-          <h1>Business Viability Report</h1>
-          <p>LocationVentureLens Analysis</p>
-        </div>
-
+        {/* ... (keep report-header) ... */}
+        
+        {/* --- NEW: Display the dynamic data --- */}
         <div className="report-section">
-          <h2><i className="fa-solid fa-map-location-dot"></i> Selected Location</h2>
-          <p><strong>Latitude:</strong> {coords.lat.toFixed(6)}</p>
-          <p><strong>Longitude:</strong> {coords.lng.toFixed(6)}</p>
+          <h2><i className="fa-solid fa-road"></i> Proximity to Key Locations</h2>
+          <table className="proximity-table">
+            <thead>
+              <tr>
+                <th>Destination</th>
+                <th>Road Distance (km)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {analysisData.proximity_analysis.map(item => (
+                <tr key={item.name}>
+                  <td>{item.name}</td>
+                  <td>{item.distance_km}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
 
-        <div className="report-section">
-          <h2><i className="fa-solid fa-chart-pie"></i> Market Analysis (Placeholder)</h2>
-          <p><strong>Demographics:</strong> Young population with moderate income.</p>
-          <p><strong>Competition:</strong> Low competition for boutique cafes, high for general stores.</p>
-          <p><strong>Foot Traffic:</strong> Estimated 500-700 people per day.</p>
-        </div>
-
-        <div className="report-section">
-          <h2><i className="fa-solid fa-thumbs-up"></i> Viability Score (Placeholder)</h2>
-          <div className="score-box">
-            <span>78/100</span>
-            <p>Good Potential</p>
-          </div>
-          <p>This location shows strong potential for a service-based business targeting young adults. Infrastructure and accessibility are rated highly.</p>
-        </div>
-
-        <div className="report-actions">
-          <button onClick={handleGoBack} className="report-action-button back-button">
-            <i className="fa-solid fa-arrow-left"></i> Go Back
-          </button>
-          <button onClick={handleDownload} className="report-action-button download-button">
-            <i className="fa-solid fa-download"></i> Download as PDF
-          </button>
-        </div>
+        {/* ... (you can add other report sections here) ... */}
+        {/* ... (keep report-actions) ... */}
       </div>
     </div>
   );

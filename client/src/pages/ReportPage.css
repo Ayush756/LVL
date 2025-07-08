@@ -113,3 +113,20 @@
   transform: translateY(-2px);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
+.proximity-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+.proximity-table th, .proximity-table td {
+  border: 1px solid #dee2e6;
+  padding: 12px;
+  text-align: left;
+}
+.proximity-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+}
+.proximity-table tbody tr:nth-child(odd) {
+  background-color: #f8f9fa;
+}
