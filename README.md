@@ -51,3 +51,26 @@ pray for the best
 
 Vayena vane cry bout it
 
+Updated :
+install postgis
+
+install osm2pgrouting( tool to download map data )
+
+TO DOWN LOAD MAP DATA GO TO openstreetmap and that area and click export select reasonably small
+
+< 
+
+osm2pgrouting \
+--file LVL/28Kilo.osm \
+
+--conf /opt/homebrew/opt/osm2pgrouting/share/osm2pgrouting/mapconfig.xml \ ( this will be diff )
+
+--host localhost \
+--port 5432 \
+--dbname LVL \
+
+--username Ayush \ ( this will be diff )
+
+--password \
+--clean >
+
