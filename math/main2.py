@@ -31,6 +31,7 @@ def evaluate_location():
     comp_population = [c['population'] for c in comps]
 
     # Combine for Huff/Gravity
+    
     all_attr = [attractiveness] + comp_attractiveness
     all_dist = [distance] + comp_distances
     all_pop = [population] * comp_population
@@ -56,12 +57,12 @@ def evaluate_location():
     # Define criteria and compute AHP weights
     criteria_names = ["demographic","poi_amenity","accessibility","affordability","huff_model","distance"]
     pairwise = [
-        [1,    2,    3,   3,   4,  3],
-        [0.5,  1,    2,   2,   3,  2],
-        [0.33, 0.5,  1,   1,   2,  1],
-        [0.33, 0.5,  1,   1,   2,  1],
-        [0.25, 0.33, 0.5, 0.5, 1,  1],
-        [0.33, 0.5,  1,   1,   1,  1],
+        [1,    3,    3,   4,     2,  4],
+        [0.33,  1,   2,   1,     0.25,  2],
+        [0.33, 0.5,  1,   0.5,   0.33,  1],
+        [0.25, 0.5,  2,   1,     .25,  1.25],
+        [0.5,  4,    3,   4,     1,     2],
+        [0.25, 0.5,  1,   .8,     1,    0.25]
     ]
     weights = ahp_weights(pairwise)
     factors = [[S_dem_all, S_poi, S_acc, S_aff, S_huff, S_dist]]

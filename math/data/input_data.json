@@ -1,30 +1,32 @@
 {
   "candidate": {
     "location_id": "loc_001",
-    "population": 4500,
-    "income": 75000,
-    "amenities": 80,
-    "foot_traffic": 350,
+    "population": 5000,
+    "income": 750,
+    "amenities": 8,
+    "foot_traffic": 550,
     "connectivity_score": 0.7,
     "revenue": 50000,
     "rent": 1500,
-    "distance": 0.5,
+    "distance": 0.6,
     "attractiveness": 3000
   },
   "competitors": [
     {
       "name": "CoffeeZone",
-       "population": 3000,
-      "distance": 1.2,
+       "population": 30000,
+      "distance": 0.8,
       "attractiveness": 2000,
-        "amenities": 5
+        "amenities": 5,
+      "foot_traffic": 500
     },
     {
       "name": "BeanTown",
        "population": 1000,
       "distance": 1.8,
       "attractiveness": 1800,
-        "amenities": 4
+        "amenities": 4, 
+      "foot_traffic": 400
         
     },
     {
@@ -32,7 +34,8 @@
        "population": 2000,
       "distance": 2.1,
       "attractiveness": 2200,
-        "amenities": 6
+        "amenities": 6,
+      "foot_traffic": 600
     }
   ]
 }

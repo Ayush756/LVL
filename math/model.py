@@ -1,7 +1,7 @@
 import numpy as np
 
 # Gravity Model
-def gravity_model(populations, distances, attractiveness=None, beta=2):
+def gravity_model(populations, distances, attractiveness=None, beta=3):
     """
     Computes the gravity score for each location.
     G_i = (P_i * A_i) / D_i^β

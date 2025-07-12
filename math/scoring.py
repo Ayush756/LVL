@@ -42,17 +42,17 @@ def poi_amenity_score(amenity_counts):
     return min_max_scale(poi_arr)
 
 # scoring.py (continued)
-def accessibility_score(footfalls, connectivity):
+def accessibility_score(footfalls, connectivity=None):
     """
     Compute an accessibility score from foot traffic and connectivity data.
     Both inputs are lists (same length). We normalize each and take the average:
     score = (normalized_footfall + normalized_connectivity) / 2.
     """
     foot_arr = np.array(footfalls, dtype=float)
-    conn_arr = np.array(connectivity, dtype=float)
+    # conn_arr = np.array(connectivity, dtype=float)
     foot_norm = min_max_scale(foot_arr)
-    conn_norm = min_max_scale(conn_arr)
-    return (foot_norm + conn_norm) / 2
+    # conn_norm = min_max_scale(conn_arr)
+    return foot_norm  
 
 def normalize_distance(distances):
     d = np.array(distances, dtype=float)
@@ -63,7 +63,6 @@ def normalize_distance(distances):
     return (d_max - d) / (d_max - d_min)  # closer = higher score
 
 
-#affordability = revenue / (revenue + rent)
 
 # # scoring.py (continued)
 def affordability_score(rents, revenues):
