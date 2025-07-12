@@ -1,57 +1,105 @@
-# example_usage.py
 import numpy as np
-from ahp import ahp_weights
-from scoring import (demographic_fit_score, competition_score, poi_amenity_score, accessibility_score, affordability_score, weighted_score)
+import random
 
-# --- Synthetic demo data for 3 locations (e.g., areas near Kathmandu University) ---
+from scoring import (
+    demographic_fit_score,
+    competition_score,
+    poi_amenity_score,
+    accessibility_score,
+    affordability_score,
+    weighted_score
+)
+from model import gravity_model, huff_model
+from normalization import min_max_scale
+from ahp import ahp_weights  # <-- AHP is now used
 
-# Population (e.g. within a 1 km radius)
-populations = [12000, 8000, 15000]        # e.g. higher = more potential customers
-# Average income in area (in USD)
-incomes = [500, 300, 700]               # e.g. higher = more spending power
+# === 1. Candidate location data ===
+population       = [12000]
+income           = [500]
+competitors      = [random.randint(3, 10)]
+amenities        = [20]
+footfall         = [1000]
+connectivity     = [5]
+rent             = [1000]
+revenue          = [3000]
+attractiveness   = revenue
+distance         = [0.8]
 
-# Competitor counts (number of similar coffee shops nearby)
-competitors = [3, 10, 5]                # more competitors is worse
+# === 2. Competitor data ===
+num_competitors = 5
+competitor_attractiveness = [random.randint(1500, 4000) for _ in range(num_competitors)]
+competitor_distances = [round(random.uniform(0.5, 3.0), 2) for _ in range(num_competitors)]
 
-# Nearby amenities count (POIs like shops, transit, parks within walking distance)
-amenities = [20, 5, 15]               # more amenities = better environment
+# === 3. Combine candidate + competitors ===
+all_attractiveness = attractiveness + competitor_attractiveness
+all_distances = distance + competitor_distances
+all_populations = population * len(all_attractiveness)
 
-# Footfall (estimated daily pedestrian traffic) and connectivity (e.g. transit stops)
-footfalls = [1000, 300, 2000]         # higher means more people passing by
-connectivity = [5, 2, 8]             # number of transit stops or road intersections
+# === 4. Compute Huff and Gravity
+huff_scores = huff_model(all_attractiveness, all_distances, beta=2)
+S_huff = [huff_scores[0]]  # Candidate only
 
-# Rent (monthly) vs expected monthly revenue
-rents = [1000, 800, 1200]            # e.g. commercial rent in USD
-revenues = [3000, 1500, 5000]        # e.g. estimated revenue if shop is open
+G_raw = gravity_model(all_populations, all_distances, all_attractiveness, beta=2)
+S_grav = [min_max_scale(G_raw)[0]]
 
-# Compute individual factor scores (arrays of length 3)
-dem_score = demographic_fit_score(populations, incomes)
-comp_score = competition_score(competitors)
-poi_score = poi_amenity_score(amenities)
-acc_score = accessibility_score(footfalls, connectivity)
-aff_score = affordability_score(rents, revenues)
+# === 5. Compute other scores
+S_dem  = demographic_fit_score(population, income)
+S_comp = competition_score(competitors)
+S_poi  = poi_amenity_score(amenities)
+S_acc  = accessibility_score(footfall, connectivity)
+S_aff  = affordability_score(rent, revenue)
+S_dist = [1 - min_max_scale(all_distances)[0]]  # closer = higher
 
-print("Demographic Fit Scores:     ", dem_score)
-print("Competition Scores:         ", comp_score)
-print("POI/Amenity Scores:         ", poi_score)
-print("Accessibility Scores:       ", acc_score)
-print("Affordability Scores:       ", aff_score)
+# === 6. Stack factor scores
+factor_matrix = np.vstack([
+    S_dem, S_comp, S_poi, S_acc, S_aff, S_huff, S_grav, S_dist
+])
 
-# --- AHP weights for factors ---
-# Example pairwise comparison matrix for 5 factors (row = factor i vs column = factor j)
-#         Dem   Comp  POI   Acc   Aff
-ahp_matrix = [
-    [1,     3,    1/2,  1,    2   ],  # Demographic vs others
-    [1/3,   1,    1/5,  1/2,  1   ],  # Competition
-    [2,     5,    1,    3,    4   ],  # Amenities
-    [1,     2,    1/3,  1,    2   ],  # Accessibility
-    [1/2,   1,    1/4,  1/2,  1   ]   # Affordability
+criteria_names = [
+    "demographic", "competition", "poi_amenity", "accessibility",
+    "affordability", "huff_model", "gravity_model", "distance"
 ]
-weights = ahp_weights(ahp_matrix)
-print("AHP weights (Dem, Comp, POI, Acc, Aff):", np.round(weights, 3))
 
-# Compute final viability score for each location
-factor_scores = np.vstack([dem_score, comp_score, poi_score, acc_score, aff_score])
-# weighted_score expects factor_scores as list of score lists
-final_scores = weighted_score(factor_scores, weights)
-print("Final Viability Scores:    ", np.round(final_scores, 3))
+# === 7. AHP pairwise comparison matrix (customize if needed)
+pairwise_matrix = [
+    [1,     2,     3,    3,     4,     3,    3,    5],
+    [0.5,   1,     2,    2,     3,     2,    2,    4],
+    [0.33,  0.5,   1,    1,     2,     1,    1,    2],
+    [0.33,  0.5,   1,    1,     2,     1,    1,    2],
+    [0.25,  0.33,  0.5,  0.5,   1,     1,    0.5,  2],
+    [0.33,  0.5,   1,    1,     1,     1,    1,    2],
+    [0.33,  0.5,   1,    1,     2,     1,    1,    2],
+    [0.2,   0.25,  0.5,  0.5,   0.5,   0.5,  0.5,  1]
+]
+weights = ahp_weights(pairwise_matrix)
+
+# === 8. Final score
+final_score = weighted_score(factor_matrix, weights)[0]
+
+# === 9. Output
+print("\n--- Candidate Location ---")
+print(f"Population        : {population[0]}")
+print(f"Income            : ${income[0]}")
+print(f"Competitors       : {competitors[0]}")
+print(f"Amenities         : {amenities[0]}")
+print(f"Footfall          : {footfall[0]}")
+print(f"Connectivity      : {connectivity[0]}")
+print(f"Rent              : ${rent[0]}")
+print(f"Revenue           : ${revenue[0]}")
+print(f"Distance          : {distance[0]} km")
+
+print("\n--- Randomized Competitor Data ---")
+for i in range(num_competitors):
+    print(f"Competitor {i+1}: Revenue=${competitor_attractiveness[i]}, Distance={competitor_distances[i]} km")
+
+print("\n--- Sub-scores (Normalized to [0,1]) ---")
+for name, score in zip(criteria_names, factor_matrix):
+    print(f"{name:15}: {score[0]:.3f}")
+
+print("\n--- AHP-Derived Weights ---")
+for name, w in zip(criteria_names, weights):
+    print(f"{name:15}: {w:.3f}")
+
+print("\n--- Final Viability Score ---")
+print(f"Score (0–1): {final_score:.3f}")
+print(f"Score (%): {final_score * 100:.2f}%")

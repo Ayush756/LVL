@@ -1,0 +1,38 @@
+{
+  "candidate": {
+    "location_id": "loc_001",
+    "population": 4500,
+    "income": 75000,
+    "amenities": 80,
+    "foot_traffic": 350,
+    "connectivity_score": 0.7,
+    "revenue": 50000,
+    "rent": 1500,
+    "distance": 0.5,
+    "attractiveness": 3000
+  },
+  "competitors": [
+    {
+      "name": "CoffeeZone",
+       "population": 3000,
+      "distance": 1.2,
+      "attractiveness": 2000,
+        "amenities": 5
+    },
+    {
+      "name": "BeanTown",
+       "population": 1000,
+      "distance": 1.8,
+      "attractiveness": 1800,
+        "amenities": 4
+        
+    },
+    {
+      "name": "CafeCentral",
+       "population": 2000,
+      "distance": 2.1,
+      "attractiveness": 2200,
+        "amenities": 6
+    }
+  ]
+}

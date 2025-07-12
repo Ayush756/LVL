@@ -17,19 +17,19 @@ def demographic_fit_score(populations, incomes):
     # Combine by averaging
     return (pop_norm + inc_norm) / 2
 
-# scoring.py (part 2 of 3)
-def competition_score(competitor_counts):
-    """
-    Compute a competition score from a list of competitor counts.
-    We min-max normalize the counts (more competitors => higher normalized value),
-    then invert: score = 1 - normalized_competitors.
-    So fewer competitors -> score close to 1, more -> closer to 0.
-    """
-    comp_arr = np.array(competitor_counts, dtype=float)
-    # Normalize to [0,1]
-    comp_norm = min_max_scale(comp_arr)
-    # Invert: fewer competitors -> higher score
-    return 1 - comp_norm
+# # scoring.py (part 2 of 3)
+# def competition_score(competitor_counts):
+#     """
+#     Compute a competition score from a list of competitor counts.
+#     We min-max normalize the counts (more competitors => higher normalized value),
+#     then invert: score = 1 - normalized_competitors.
+#     So fewer competitors -> score close to 1, more -> closer to 0.
+#     """
+#     comp_arr = np.array(competitor_counts, dtype=float)
+#     # Normalize to [0,1]
+#     comp_norm = min_max_scale(comp_arr)
+#     # Invert: fewer competitors -> higher score
+#     return 1 - comp_norm
 
 # scoring.py (part 3 of 3)
 def poi_amenity_score(amenity_counts):
@@ -54,9 +54,18 @@ def accessibility_score(footfalls, connectivity):
     conn_norm = min_max_scale(conn_arr)
     return (foot_norm + conn_norm) / 2
 
+def normalize_distance(distances):
+    d = np.array(distances, dtype=float)
+    d_min = d.min()
+    d_max = d.max()
+    if d_max == d_min:
+        return np.ones_like(d)  # if all distances same, assign 1
+    return (d_max - d) / (d_max - d_min)  # closer = higher score
+
+
 #affordability = revenue / (revenue + rent)
 
-# scoring.py (continued)
+# # scoring.py (continued)
 def affordability_score(rents, revenues):
     """
     Compute an affordability index from lists of rents and expected revenues.
@@ -75,13 +84,12 @@ def affordability_score(rents, revenues):
 
 def weighted_score(factor_scores, weights):
     """
-    Compute final weighted score given list of factor score arrays (or lists) 
+    Compute final weighted score given list of factor scores (floats)
     and corresponding list of weights. Both lengths must match.
-    Returns a numpy array of final viability scores (weighted sum).
+    Returns a single float (weighted sum).
     """
     scores = np.array(factor_scores, dtype=float)
     w = np.array(weights, dtype=float)
-    if scores.shape[0] != len(weights):
+    if scores.shape[0] != w.shape[0]:
         raise ValueError("Number of factors and weights must match")
-    # Weighted sum: dot product of weights with factor scores for each location
-    return np.dot(w, scores)
+    return np.dot(scores, w)
