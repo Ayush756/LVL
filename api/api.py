@@ -43,6 +43,40 @@ def db_test():
         # Return the actual error for easier debugging
         return jsonify({"error": f"Database connection failed: {e}"}), 500
 
+def find_closest_grid_point(lng, lat):
+    conn = get_db_connection()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+    query = """
+        SELECT grid_row, grid_col, population
+        FROM population_grid
+        ORDER BY geom <-> ST_SetSRID(ST_MakePoint(%s, %s), 4326)
+        LIMIT 1;
+    """
+    try:
+        cur.execute(query, (lng, lat))
+        closest_point = cur.fetchone()
+    finally:
+        cur.close()
+        conn.close()
+    return closest_point
+
+def get_5x5_grid_population(center_row, center_col):
+    conn = get_db_connection()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+    row_min, row_max = center_row - 2, center_row + 2
+    col_min, col_max = center_col - 2, center_col + 2
+    query = """
+        SELECT SUM(population) as total_population
+        FROM population_grid
+        WHERE grid_row BETWEEN %s AND %s AND grid_col BETWEEN %s AND %s;
+    """
+    try:
+        cur.execute(query, (row_min, row_max, col_min, col_max))
+        result = cur.fetchone()
+    finally:
+        cur.close()
+        conn.close()
+    return result['total_population'] if result and result['total_population'] is not None else 0
 
 # Route to handle location data from the map
 @app.route('/api/location', methods=['POST'])
@@ -105,6 +139,20 @@ def calculate_road_distance(start_node_id, end_node_id):
     return result['distance_in_meters'] if result and result['distance_in_meters'] is not None else None
 
 # --- NEW Proximity Analysis Logic ---
+
+@app.route('/api/analyze_population', methods=['POST'])
+def analyze_population():
+    clicked_point = request.get_json()
+    lat, lng = clicked_point['lat'], clicked_point['lng']
+    center_grid_point = find_closest_grid_point(lng, lat)
+    if not center_grid_point:
+        return jsonify({"error": "No population data found near the selected location."}), 404
+    closest_point_population = center_grid_point['population']
+    total_influenced_population = get_5x5_grid_population(center_grid_point['grid_row'], center_grid_point['grid_col'])
+    return jsonify({
+        "closest_point_population": closest_point_population,
+        "influenced_population_5x5": total_influenced_population
+    })
 
 @app.route('/api/analyze_proximity', methods=['POST'])
 def analyze_proximity():

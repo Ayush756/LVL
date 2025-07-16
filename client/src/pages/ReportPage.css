@@ -130,3 +130,34 @@
 .proximity-table tbody tr:nth-child(odd) {
   background-color: #f8f9fa;
 }
+/* Add to the bottom of ReportPage.css */
+
+.report-section .stat-card {
+  display: inline-block; /* Place cards next to each other */
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-left: 5px solid #007bff;
+  padding: 15px 20px;
+  border-radius: 8px;
+  margin-right: 20px;
+  margin-top: 10px;
+  min-width: 250px;
+}
+
+.stat-card h4 {
+  margin: 0 0 5px 0;
+  color: #495057;
+  font-size: 1rem;
+}
+
+.stat-card p {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 600;
+  color: #343a40;
+}
+
+/* Spinner icon for loading state */
+.fa-spin {
+  margin-right: 10px;
+}
