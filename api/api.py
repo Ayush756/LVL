@@ -165,12 +165,12 @@ def analyze_proximity():
     # In a real app, this would come from a database query.
     # Replace these with real coordinates for schools, hospitals, markets, etc.
     destinations = {
-        "28 Kilo highway":    { "lat": 27.624931, "lng": 85.541031 },
-        "LMTC road":     { "lat": 27.618500, "lng": 85.543284 },
-        "Gamya side":     { "lat": 27.616308, "lng": 85.539899 },
-        "Khadpu":  { "lat": 27.615042, "lng": 85.532427 },
-        "Banepa side":           { "lat": 27.625653, "lng": 85.531601 },
-        "KU gate":  { "lat": 27.620517, "lng": 85.538328 }
+        "28 Kilo highway":    { "lat": 27.624931, "lng": 85.541031,"weight":2 },
+        "LMTC road":     { "lat": 27.618500, "lng": 85.543284,"weight":1 },
+        "Gamya side":     { "lat": 27.616308, "lng": 85.539899,"weight":1 },
+        "Khadpu":  { "lat": 27.615042, "lng": 85.532427,"weight":1 },
+        "Banepa side":           { "lat": 27.625653, "lng": 85.531601,"weight":1 },
+        "KU gate":  { "lat": 27.620517, "lng": 85.538328,"weight":3 }
     }
 
     # Find the nearest road node for our starting point
@@ -178,31 +178,23 @@ def analyze_proximity():
     if not start_node:
         return jsonify({"error": "Could not find a nearby road for your starting point."}), 400
 
-    # --- 2. LOOP AND CALCULATE DISTANCE FOR EACH DESTINATION ---
-    results = []
-    for name, coords in destinations.items():
-        print(f"Analyzing distance to: {name}")
-        
-        # Find the nearest road node for the destination
-        dest_node = find_nearest_road_node(coords['lng'], coords['lat'])
-        
-        if not dest_node:
-            distance_km = "N/A (No nearby road found)"
-        else:
-            # Calculate the distance
+    weighted_distance_sum = 0
+    valid_distances = []
+
+    for name, data in destinations.items():
+        dest_node = find_nearest_road_node(data['lng'], data['lat'])
+        if dest_node:
             distance_meters = calculate_road_distance(start_node, dest_node)
             if distance_meters is not None:
-                distance_km = round(distance_meters / 1000, 2) # Convert to km
-            else:
-                distance_km = "N/A (No route found)"
+                distance_km = distance_meters / 1000
+                valid_distances.append(distance_km)
+                weighted_distance_sum += distance_km * data['weight']
 
-        results.append({
-            "name": name,
-            "distance_km": distance_km
-        })
+    # "Range of Influence" is the max distance to any key point
+    range_of_influence_km = max(valid_distances) if valid_distances else 0
 
-    # --- 3. RETURN THE FULL REPORT ---
+    # 3. NEW JSON RESPONSE
     return jsonify({
-        "start_location": {"lat": start_lat, "lng": start_lng},
-        "proximity_analysis": results
+        "range_of_influence_km": round(range_of_influence_km, 2),
+        "accessibility_score": round(weighted_distance_sum, 2)
     })

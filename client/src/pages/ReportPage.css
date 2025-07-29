@@ -161,3 +161,10 @@
 .fa-spin {
   margin-right: 10px;
 }
+/* Add to the bottom of ReportPage.css */
+.stat-card small {
+  display: block;
+  margin-top: 5px;
+  color: #6c757d;
+  font-style: italic;
+}
