@@ -1,0 +1,37 @@
+import pandas as pd
+from sqlalchemy import create_engine
+import json
+
+# --- Candidate data (from JSON or manual input) ---
+json_file_path = 'E:/project/LVL/math/data/input_data.json'
+with open(json_file_path, 'r') as f:
+    data = json.load(f)
+candidate = data['candidate']
+
+# --- Competitors from database ---
+user = 'kishor'
+password = 'kishor'
+host = 'localhost'
+port = '5432'
+database = 'LVL'
+table_name = 'competitors'
+
+connection_string = f'postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}'
+engine = create_engine(connection_string)
+df = pd.read_sql(f"SELECT * FROM {table_name}", engine)
+comps = df.to_dict(orient='records')
+
+print("\nCompetitors data:")
+for comp in comps:
+    print(comp)
+    
+# Extract population column as a list
+populations = df['population'].tolist()
+print("Populations:", populations)
+
+# Extract other columns, e.g., 'distance', 'capacity'
+distances = df['distance'].tolist() if 'distance' in df.columns else []
+capacities = df['capacity'].tolist() if 'capacity' in df.columns else []
+
+print("Distances:", distances)
+print("Capacities:", capacities)

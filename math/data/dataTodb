@@ -8,7 +8,7 @@ host = 'localhost'
 port = '5432'
 database = 'LVL'
 table_name = 'competitors'
-csv_file_path = 'E:\project\LVL\math\data\data.csv'  # Make sure this is correct
+csv_file_path = r'E:\project\LVL\math\data\data.csv'  # Use raw string for Windows path
 
 # === 1. Read the CSV file ===
 df = pd.read_csv(csv_file_path)
@@ -27,3 +27,5 @@ print(f"\nData successfully inserted into '{table_name}' table in '{database}' d
 verify_df = pd.read_sql(f"SELECT * FROM {table_name}", engine)
 print("\nSample data from DB:")
 print(verify_df.head())
+print(df)
+print(verify_df)

@@ -1,6 +1,6 @@
 # scoring.py (part 1 of 3)
 import numpy as np
-from normalization import min_max_scale
+from normalization import min_max_scale,z_score_scale
 
 def demographic_fit_score(populations, incomes):
     """
@@ -37,9 +37,10 @@ def poi_amenity_score(amenity_counts):
     Compute a POI/amenity score given a list of counts of nearby facilities.
     We normalize the counts so that locations with more amenities score higher.
     """
-    poi_arr = np.array(amenity_counts, dtype=float)
+    mean = 2.91
+    std = 1.68
     # Normalize to [0,1] (more amenities => higher normalized value)
-    return min_max_scale(poi_arr)
+    return z_score_scalecale(amenity_counts,mean,std)
 
 # scoring.py (continued)
 def accessibility_score(footfalls, connectivity=None):
@@ -48,9 +49,9 @@ def accessibility_score(footfalls, connectivity=None):
     Both inputs are lists (same length). We normalize each and take the average:
     score = (normalized_footfall + normalized_connectivity) / 2.
     """
-    foot_arr = np.array(footfalls, dtype=float)
-    # conn_arr = np.array(connectivity, dtype=float)
-    foot_norm = min_max_scale(foot_arr)
+    mean=522.35
+    std=172.81
+    foot_norm = z_score_scale(footfalls,mean, std)
     # conn_norm = min_max_scale(conn_arr)
     return foot_norm  
 
