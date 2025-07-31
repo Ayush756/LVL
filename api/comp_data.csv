@@ -1,11 +1,11 @@
-name,lat,lon
-KU Fast Food Cafe,27.618378 ,85.538344
-metro cafe,27.620963,85.538290
- mayo,27.621723,85.538204
-Downtown Cafe,27.61708,85.537244
-Manakamana,27.620873, 85.538322
-kora cafe,27.620050, 85.537013
-Brew and bites, 27.620601, 85.538450
-niru bakery,27.621262,85.538462
-The brew house, 27.621714,85.539647
-thuldai ko chiya chautari,27.621381,85.541497
+name,lat,lon,capacity,variety
+KU Fast Food Cafe,27.618378 ,85.538344,30,5
+metro cafe,27.620963,85.538290,22,7
+mayo,27.621723,85.538204,15,6
+Downtown Cafe,27.61708,85.537244,18,6
+Manakamana,27.620873, 85.538322,10,4
+kora cafe,27.620050, 85.537013,15,5
+Brew and bites, 27.620601, 85.538450,22,7
+niru bakery,27.621262,85.538462,14,6
+The brew house, 27.621714,85.539647,6,5
+thuldai ko chiya chautari,27.621381,85.541497,40,7.5

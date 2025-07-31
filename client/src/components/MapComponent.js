@@ -17,22 +17,23 @@ function MapEventsHandler({ onMapClick }) {
 
 function MapComponent({ onMapClick, clickedCoords }) {
   // Center the map on Nepal
-  const initialPosition = [28.3949, 84.1240]; 
+  const initialPosition = [27.625, 85.555]; 
 
   // Define the bounding box for Nepal to restrict panning
-  const nepalBounds = [
-    [26.347, 80.058], // Southwest corner
-    [30.447, 88.201], // Northeast corner
+  const dhulikhelbounds = [
+     [27.60, 85.505], // Southwest corner of the box
+    [27.65, 85.58], // Northeast corner
   ];
 
   return (
     <div className="map-container">
       <MapContainer 
         center={initialPosition} 
-        zoom={7} 
+        zoom={14} 
         className="leaflet-container"
-        maxBounds={nepalBounds} // Restrict map panning
-        minZoom={7}             // Prevent zooming out too far
+        maxBounds={dhulikhelbounds} // Restrict map panning
+        minZoom={13}   
+        maxBoundsViscosity={1.0}          // Prevent zooming out too far
       >
         <TileLayer
           attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

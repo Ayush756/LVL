@@ -1,7 +1,7 @@
 import React from 'react';
 
-// We now accept 'onGenerateReport' as a prop
-function Dashboard({ clickedCoords, statusMessage, onGenerateReport }) {
+// We now accept 'userInputs' and 'onInputChange' as props
+function Dashboard({ clickedCoords, statusMessage, onGenerateReport, userInputs, onInputChange }) {
   return (
     <div className="dashboard">
       <div className="dashboard-header">
@@ -9,11 +9,46 @@ function Dashboard({ clickedCoords, statusMessage, onGenerateReport }) {
         <h1>LocalVentureLens</h1>
       </div>
 
-      {/* --- This section is unchanged --- */}
       <div className="info-block">
         <h3>Instructions</h3>
-        <p>Click on the map of Nepal to select a location for business viability analysis.</p>
+        <p>1. Click a location on the map. <br/> 2. Enter your business details below. <br/> 3. Generate the report.</p>
       </div>
+
+      {/* --- NEW USER INPUT SECTION --- */}
+      <div className="info-block">
+        <h3>Your Business Parameters</h3>
+        <div className="input-group">
+          <label htmlFor="cost">Avg. Cost (e.g., NPR 300)</label>
+          <input 
+            type="number" 
+            id="cost" 
+            name="cost" 
+            value={userInputs.cost} 
+            onChange={onInputChange} 
+          />
+        </div>
+        <div className="input-group">
+          <label htmlFor="variety">Variety (e.g., 25 menu items)</label>
+          <input 
+            type="number" 
+            id="variety" 
+            name="variety" 
+            value={userInputs.variety} 
+            onChange={onInputChange} 
+          />
+        </div>
+        <div className="input-group">
+          <label htmlFor="capacity">Capacity (e.g., 40 seats)</label>
+          <input 
+            type="number" 
+            id="capacity" 
+            name="capacity" 
+            value={userInputs.capacity} 
+            onChange={onInputChange} 
+          />
+        </div>
+      </div>
+
       <div className="info-block">
         <h3>Selected Coordinates</h3>
         {clickedCoords ? (
@@ -29,17 +64,12 @@ function Dashboard({ clickedCoords, statusMessage, onGenerateReport }) {
           </div>
         ) : (<p className="placeholder-text">No location selected yet.</p>)}
       </div>
-      <div className="info-block">
-        <h3>Status</h3>
-        {statusMessage ? (<p className="status-message success">{statusMessage}</p>) : (<p className="placeholder-text">Waiting for selection...</p>)}
-      </div>
-
-      {/* --- NEW BUTTON SECTION --- */}
+      
       <div className="action-block">
         <button 
           className="report-button"
           onClick={onGenerateReport}
-          disabled={!clickedCoords} // Button is disabled if no coordinates are selected
+          disabled={!clickedCoords}
         >
           <i className="fa-solid fa-chart-line"></i>
           Generate Report

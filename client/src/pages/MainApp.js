@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // <-- 1. Import
+import React, { useState } from 'react'; 
+import { useNavigate } from 'react-router-dom';
 import './MainApp.css';
 import Dashboard from '../components/Dashboard';
 import MapComponent from '../components/MapComponent';
@@ -7,31 +7,36 @@ import MapComponent from '../components/MapComponent';
 function MainApp() {
   const [clickedCoords, setClickedCoords] = useState(null);
   const [statusMessage, setStatusMessage] = useState('');
-  const navigate = useNavigate(); // <-- 2. Initialize navigate
+  const navigate = useNavigate();
+
+  // --- NEW: State to manage user's business parameters ---
+  const [userInputs, setUserInputs] = useState({
+    cost: 300,
+    variety: 25,
+    capacity: 40
+  });
 
   const handleMapClick = (coords) => {
     setClickedCoords(coords);
-    setStatusMessage('Sending coordinates to backend...');
-
-    fetch('/api/location', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ lat: coords.lat, lng: coords.lng }),
-    })
-      .then(response => response.json())
-      .then(data => {
-        setStatusMessage(data.message || 'Received valid response.');
-      })
-      .catch(error => {
-        setStatusMessage('Error: Could not contact backend.');
-      });
+    setStatusMessage('Location selected. Enter your parameters.');
+    // Removed the old fetch('/api/location') as it's no longer needed here
   };
 
-  // --- 3. NEW NAVIGATION FUNCTION ---
+  // --- NEW: Function to update state when user types in an input box ---
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    // We use parseInt to make sure we are storing numbers, not strings
+    setUserInputs(prevInputs => ({
+      ...prevInputs,
+      [name]: parseInt(value, 10) || 0
+    }));
+  };
+
+  // --- MODIFIED: Pass userInputs along with coordinates ---
   const handleGenerateReport = () => {
     if (clickedCoords) {
-      // Navigate to the /report page and pass the coordinates in the state
-      navigate('/report', { state: { coords: clickedCoords } });
+      // Pass BOTH the coordinates and the user's inputs to the report page
+      navigate('/report', { state: { coords: clickedCoords, userInputs: userInputs } });
     }
   };
 
@@ -40,7 +45,10 @@ function MainApp() {
       <Dashboard 
         clickedCoords={clickedCoords} 
         statusMessage={statusMessage}
-        onGenerateReport={handleGenerateReport} // <-- 4. Pass the function
+        onGenerateReport={handleGenerateReport}
+        // --- NEW PROPS passed to Dashboard ---
+        userInputs={userInputs}
+        onInputChange={handleInputChange}
       />
       <MapComponent 
         onMapClick={handleMapClick} 
