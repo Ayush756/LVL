@@ -140,6 +140,7 @@ def generate_report():
         score_accessibility = calculate_accessibility_score(distance_to_road)
 
         # --- 3. FINAL SCORE CALCULATION ---
+        #demographic, proximity, market share, and accessibility scores are combined using AHP weights.
         pairwise_matrix = [
             [1,   3,   2,   4],
             [1/3, 1,   1/3, 2],
