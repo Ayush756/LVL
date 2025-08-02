@@ -8,7 +8,7 @@ host = 'localhost'
 port = '5432'
 database = 'LVL'
 table_name = 'competitors'
-csv_file_path = 'comp_data.csv'
+csv_file_path = 'api\comp_data.csv'
 # Use raw string for Windows path
 
 # === 1. Read the CSV file ===
