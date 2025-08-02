@@ -1,6 +1,6 @@
 # scoring.py (part 1 of 3)
 import numpy as np
-from normStd import min_max_scale,z_score_scale
+from .normStd import min_max_scale,z_score_scale
 
 def demographic_fit_score(populations, incomes):
     """

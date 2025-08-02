@@ -4,7 +4,7 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
 from api import (
-   # find_nearest_road_node,
+    find_nearest_road_node,
     calculate_road_distance,
     get_nearby_competitors,
     get_db_connection,
@@ -37,8 +37,8 @@ app = Flask(__name__)
 CORS(app)
 
 # --- Competitors from database ---
-user = 'kishor'
-password = 'kishor'
+user = 'Ayush'
+password = 'Bleb756@'
 host = 'localhost'
 port = '5432'
 database = 'LVL'
