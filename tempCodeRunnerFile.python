@@ -1,0 +1,34 @@
+import os
+from flask import Flask, jsonify, request
+from flask_cors import CORS
+import psycopg2
+from psycopg2.extras import RealDictCursor
+from dotenv import load_dotenv
+import sys
+from api import (
+   # find_nearest_road_node,
+    calculate_road_distance,
+    get_nearby_competitors,
+    get_db_connection,
+    find_closest_grid_point,
+    get_5x5_grid_population,
+    calculate_distance_score,
+)
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'app')))
+# --- App Setup ---
+load_dotenv()
+app = Flask(__name__)
+CORS(app)
+
+
+data = request.get_json()
+coords = data['coords']
+user_inputs = data['userInputs']
+
+conn = get_db_connection()
+cur = conn.cursor(cursor_factory=RealDictCursor)
+lng = coords['lng']
+lat = coords['lat']
+
+population = get_5x5_grid_population(lng, lat, cur)
+print(f"Population in 5x5 grid: {population}")
